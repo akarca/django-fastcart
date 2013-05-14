@@ -35,3 +35,25 @@ If you use south migrate:
   ``$ ./manage.py migrate fastcart``
 or
   ``$ ./manage.py syncdb``
+
+Usage:
+**********************
+
+Add a product to cart:
+  ``<form action="{% url 'fastcart_cart_item_list' %}" method="post">{% csrf_token %}
+    <input type="hidden" name="product" value="{{ book.pk }}">
+    <input type="submit" value="Add to cart">
+  </form>``
+
+Remove a product from cart:
+  ``<form action="{% url 'fastcart_cart_item_delete' object.pk %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Delete">
+  </form>``
+
+Update quantity:
+  ``<form action="{% url 'fastcart_cart_item_update' object.pk %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="quantity" value="{{ object.quantity }}">
+    <input type="submit" value="Update">
+  </form>``
