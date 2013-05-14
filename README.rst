@@ -8,14 +8,17 @@ INSTALLATION
 ------------
 
 Install Package
--
+***************
 
-$ pip install -e 'git+git://github.com/serdarakarca/django-fastcart.git#egg=django-fastcart'
+  ``$ pip install -e 'git+git://github.com/serdarakarca/django-fastcart.git#egg=django-fastcart'``
 
 Add to INSTALLED_APPS
 *********************
 
-INSTALLED_APPS = INSTALLED_APPS + \('fastcart',\)
+  ``INSTALLED_APPS = + \(
+  ...
+  'fastcart',
+  \)``
 
 Settings
 ********
