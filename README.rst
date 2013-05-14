@@ -12,21 +12,16 @@ Install Package
 
   ``$ pip install -e 'git+git://github.com/serdarakarca/django-fastcart.git#egg=django-fastcart'``
 
-Add to INSTALLED_APPS
-*********************
-
-  ``INSTALLED_APPS = INSTALLED_APPS + (
-  'fastcart',
-  )``
-
 Settings
 ********
-Add middleware:
+Add to INSTALLED_APPS:
+  ``'fastcart',``
+Add to MIDDLEWARE_CLASSES:
   ``'fastcart.middleware.CartMiddleware',``
-Add context processor:
+Add to TEMPLATE_CONTEXT_PROCESSORS:
   ``'fastcart.context_processors.cart',``
 
-Add this line and change your model to carry with fastcart:
+Finally add this line to settings and change your model to carry with fastcart:
   ``FASTCART_PRODUCT_MODEL = 'product.Book'``
 
 Add urls
