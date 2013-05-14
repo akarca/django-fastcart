@@ -40,18 +40,21 @@ Usage:
 **********************
 
 Add a product to cart:
-  ``<form action="{% url 'fastcart_cart_item_list' %}" method="post">{% csrf_token %}
+.. code:: django
+  <form action="{% url 'fastcart_cart_item_list' %}" method="post">{% csrf_token %}
     <input type="hidden" name="product" value="{{ book.pk }}">
     <input type="submit" value="Add to cart">
-  </form>``
+  </form>
 
 Remove a product from cart:
-  ``<form action="{% url 'fastcart_cart_item_delete' object.pk %}" method="post">
+.. code:: html
+  <form action="{% url 'fastcart_cart_item_delete' object.pk %}" method="post">
     {% csrf_token %}
     <input type="submit" value="Delete">
-  </form>``
+  </form>
 
 Update quantity:
+.. code:: html
   ``<form action="{% url 'fastcart_cart_item_update' object.pk %}" method="post">
     {% csrf_token %}
     <input type="text" name="quantity" value="{{ object.quantity }}">
