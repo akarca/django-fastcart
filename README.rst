@@ -3,30 +3,32 @@ django-fastcart
 
 Django shopping cart application
 
-Installation:
--------------
 
-#### Install Package
+INSTALLATION
+------------
+
+Install Package
+-
 
 $ pip install -e 'git+git://github.com/serdarakarca/django-fastcart.git#egg=django-fastcart'
 
-#### Add to INSTALLED_APPS
+Add to INSTALLED_APPS
+*********************
 
-INSTALLED_APPS = (
-  ...
-  'fastcart',
-  ...
-)
+INSTALLED_APPS = INSTALLED_APPS + \('fastcart',\)
 
-#### Settings
+Settings
+********
 
 FASTCART_PRODUCT_MODEL = 'product.Book'
 
-#### Add urls
+Add urls
+********
 
 url(r'^cart/', include('fastcart.urls')),
 
-#### Migrate or syncdb
+Migrate or syncdb
+*****************
 
 If you use south migrate:
 $ ./manage.py migrate fastcart
