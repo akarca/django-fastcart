@@ -19,18 +19,22 @@ INSTALLED_APPS = INSTALLED_APPS + \('fastcart',\)
 
 Settings
 ********
+Add middleware:
+  ``'fastcart.middleware.CartMiddleware',``
+Add context processor:
+  ``'fastcart.context_processors.cart',``
 
-FASTCART_PRODUCT_MODEL = 'product.Book'
+Add this line and change your model to carry with fastcart:
+  ``FASTCART_PRODUCT_MODEL = 'product.Book'``
 
 Add urls
 ********
-
-url(r'^cart/', include('fastcart.urls')),
+  ``url(r'^cart/', include('fastcart.urls')),``
 
 Migrate or syncdb
 *****************
 
 If you use south migrate:
-$ ./manage.py migrate fastcart
+  ``$ ./manage.py migrate fastcart``
 or
-$ ./manage.py syncdb
+  ``$ ./manage.py syncdb``
