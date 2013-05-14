@@ -50,7 +50,7 @@ Add a product to cart:
 
 Remove a product from cart:
 
-.. code:: html
+.. code:: django
 
   <form action="{% url 'fastcart_cart_item_delete' object.pk %}" method="post">
     {% csrf_token %}
@@ -59,7 +59,7 @@ Remove a product from cart:
 
 Update quantity:
 
-.. code:: html
+.. code:: django
   
   <form action="{% url 'fastcart_cart_item_update' object.pk %}" method="post">
     {% csrf_token %}
