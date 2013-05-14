@@ -15,10 +15,9 @@ Install Package
 Add to INSTALLED_APPS
 *********************
 
-  ``INSTALLED_APPS = + \(
-  ...
+  ``INSTALLED_APPS = INSTALLED_APPS + (
   'fastcart',
-  \)``
+  )``
 
 Settings
 ********
