@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block page_title %}Cart{% endblock %}
+
+{% block content %}
+  <h1>Cart</h1>
+
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Unit Price</th>
+      <th>Quantity</th>
+      <th>Total</th>
+    </tr>
+    {% for object in cartitem_list %}
+      <tr>
+        <td>
+          <form action="{% url 'fastcart_cart_item_delete' object.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Delete">
+          </form>
+        </td>
+        <td>{{ object.product.title }}</td>
+        <td>{{ object.product.last_price }}</td>
+        <td>
+          <form action="{% url 'fastcart_cart_item_update' object.pk %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="quantity" value="{{ object.quantity }}">
+            <input type="submit" value="Update">
+          </form>
+        </td>
+        <td>{{ object.get_total_price }}</td>
+      </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="4" style="text-align:right">Total:</td>
+      <td>{{ cart.get_total_price }}</td>
+    </tr>
+  </table>
+{% endblock %}
