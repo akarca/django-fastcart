@@ -15,15 +15,6 @@ class CartItemListView(ListView):
     def get_queryset(self):
         return self.request.cart.items.all()
 
-    '''def get_context_data(self, **kwargs):
-        context = super(CartItemListView, self).get_context_data(**kwargs)
-        context.update({
-            'cart_items': [],
-        })
-        for object in context['object_list']:
-            context['cart_items'].append(object)
-        return context'''
-
     def post(self, request, *args, **kwargs):
         form = CartItemForm(request.POST)
         if form.is_valid():

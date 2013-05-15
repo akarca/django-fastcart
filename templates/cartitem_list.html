@@ -35,7 +35,7 @@
     {% endfor %}
     <tr>
       <td colspan="4" style="text-align:right">Total:</td>
-      <td>{{ cart.get_total_price }}</td>
+      <td>{{ cart.get_total_price }} {{ cart.get_price }}</td>
     </tr>
   </table>
 {% endblock %}

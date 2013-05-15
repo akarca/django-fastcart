@@ -28,14 +28,11 @@ class CartManager(models.Manager):
             user_cart, created = self.get_or_create(user=request.user)
             if session_cart_id:
                 if session_cart_id == user_cart.pk:
-                    print 'SEPET: normal akis'
                     return user_cart
                 else:
-                    print 'SEPET: 2 sepet var...'
                     try:
                         session_cart = self.get(pk=session_cart_id)
                         if session_cart.get_count() > 0:
-                            print 'SEPET: sepetleri birlestir...'
                             user_cart.clear()
                             for item in session_cart.get_items():
                                 item.cart = user_cart
@@ -45,18 +42,15 @@ class CartManager(models.Manager):
                             user_cart.reset_cached_items()
                     except self.model.DoesNotExist:
                         pass
-            print 'SEPET: kullaniciya sepet olusturduk'
             request.session['cart'] = user_cart.pk
             return user_cart
 
         if session_cart_id:
             try:
-                print 'SEPET: kullanici yok sepet var'
                 session_cart = self.get(pk=session_cart_id)
                 return session_cart
             except self.model.DoesNotExist:
                 pass
-        print 'SEPET: kullanici yok sepet yok. olusturduk'
         session_cart = self.create(user=None)
         request.session['cart'] = session_cart.pk
         return session_cart
@@ -74,8 +68,6 @@ class Cart(models.Model):
     def __init__(self, *args, **kwargs):
         super(Cart, self).__init__(*args, **kwargs)
         self.modifiers = SortedDict()
-        print 'INIT CART CATR'
-        print self.pk
         self.set_cached_items()
 
     def cachekey(self):
@@ -83,7 +75,6 @@ class Cart(models.Model):
             return 'fastcart_items_%s' % (self.pk)
 
     def set_cached_items(self):
-        print 'SET CACHED ITEMS'
         if self.cachekey():
             items = cache.get(self.cachekey())
             if items:
@@ -93,7 +84,7 @@ class Cart(models.Model):
         self.reset_cached_items()
 
     def reset_cached_items(self):
-        print 'RESET CACHED ITEMS'
+        print 'reset cached ITEMSSSSSSSSSS'
         self.cached_items = self.items.all()
         if self.cachekey():
             try:
