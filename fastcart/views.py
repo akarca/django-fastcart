@@ -20,9 +20,21 @@ class CartItemListView(ListView):
         if form.is_valid():
             form.add_to_cart(request.cart)
             if request.is_ajax():
-                return HttpResponse('success', status=200)
+                return HttpResponse(
+                    json.dumps({
+                               'result': 'success',
+                               'count': request.cart.get_count(),
+                               'total': request.cart.get_total_price(),
+                               }),
+                    mimetype="application/json")
         elif request.is_ajax():
-            return HttpResponse('fail', status=200)
+            return HttpResponse(
+                json.dumps({
+                    'result': 'fail',
+                    'count': request.cart.get_count(),
+                    'total': request.cart.get_total_price(),
+                }),
+                mimetype="application/json")
         return redirect('fastcart_cart_item_list')
 
 
@@ -44,5 +56,11 @@ class CartItemUpdateView(SingleObjectMixin, View):
         if form.is_valid():
             form.save()
             if request.is_ajax():
-                return HttpResponse('ok', status=200)
+                return HttpResponse(
+                    json.dumps({
+                        'result': 'success',
+                        'count': request.cart.get_count(),
+                        'total': request.cart.get_total_price(),
+                    }),
+                    mimetype="application/json")
         return redirect(self.success_url)
