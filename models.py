@@ -25,18 +25,20 @@ class CartManager(models.Manager):
         user_cart = None
         session_cart = None
         session_cart_id = None
+        site = get_site()
+        session_key = 'cart_%s' % site.pk
 
-        if 'cart' in request.session:
-            session_cart_id = request.session['cart']
+        if session_key in request.session:
+            session_cart_id = request.session[session_key]
 
         if request.user.is_authenticated():
-            user_cart, created = self.get_or_create(user=request.user, site=get_site())
+            user_cart, created = self.get_or_create(user=request.user, site=site)
             if session_cart_id:
                 if session_cart_id == user_cart.pk:
                     return user_cart
                 else:
                     try:
-                        session_cart = self.get(pk=session_cart_id, site=get_site())
+                        session_cart = self.get(pk=session_cart_id, site=site)
                         if session_cart.get_count() > 0:
                             user_cart.clear()
                             for item in session_cart.get_items():
@@ -47,17 +49,17 @@ class CartManager(models.Manager):
                             user_cart.reset_cached_items()
                     except self.model.DoesNotExist:
                         pass
-            request.session['cart'] = user_cart.pk
+            request.session[session_key] = user_cart.pk
             return user_cart
 
         if session_cart_id:
             try:
-                session_cart = self.get(pk=session_cart_id)
+                session_cart = self.get(pk=session_cart_id, site=site)
                 return session_cart
             except self.model.DoesNotExist:
                 pass
-        session_cart = self.create(user=None, site=get_site())
-        request.session['cart'] = session_cart.pk
+        session_cart = self.create(user=None, site=site)
+        request.session[session_key] = session_cart.pk
         return session_cart
 
 
