@@ -8,8 +8,13 @@ from django.utils.datastructures import SortedDict
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_delete, post_save
+
+from custom_sites.models import Site
+from custom_sites.localstorage import get_site
+
 from .cart_modifiers.loader import get_cart_modifiers, get_cart_item_modifiers
 from . import get_product_model
+
 
 User = get_user_model()
 
@@ -20,18 +25,20 @@ class CartManager(models.Manager):
         user_cart = None
         session_cart = None
         session_cart_id = None
+        site = get_site()
+        session_key = 'cart_%s' % site.pk
 
-        if 'cart' in request.session:
-            session_cart_id = request.session['cart']
+        if session_key in request.session:
+            session_cart_id = request.session[session_key]
 
         if request.user.is_authenticated():
-            user_cart, created = self.get_or_create(user=request.user)
+            user_cart, created = self.get_or_create(user=request.user, site=site)
             if session_cart_id:
                 if session_cart_id == user_cart.pk:
                     return user_cart
                 else:
                     try:
-                        session_cart = self.get(pk=session_cart_id)
+                        session_cart = self.get(pk=session_cart_id, site=site)
                         if session_cart.get_count() > 0:
                             user_cart.clear()
                             for item in session_cart.get_items():
@@ -42,17 +49,17 @@ class CartManager(models.Manager):
                             user_cart.reset_cached_items()
                     except self.model.DoesNotExist:
                         pass
-            request.session['cart'] = user_cart.pk
+            request.session[session_key] = user_cart.pk
             return user_cart
 
         if session_cart_id:
             try:
-                session_cart = self.get(pk=session_cart_id)
+                session_cart = self.get(pk=session_cart_id, site=site)
                 return session_cart
             except self.model.DoesNotExist:
                 pass
-        session_cart = self.create(user=None)
-        request.session['cart'] = session_cart.pk
+        session_cart = self.create(user=None, site=site)
+        request.session[session_key] = session_cart.pk
         return session_cart
 
 
@@ -60,10 +67,20 @@ class Cart(models.Model):
     user = models.OneToOneField(User,
                                 null=True,
                                 blank=True)
+
+    site = models.ForeignKey(Site,
+                             verbose_name=u'Site',
+                             db_index=True)
+
     created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
+    updated_on = models.DateTimeField(auto_now=True,
+                                      db_index=True)
 
     objects = CartManager()
+
+    class Meta:
+        ordering = ['-updated_on']
+        # unique_together = ('cart', 'product')
 
     def __init__(self, *args, **kwargs):
         super(Cart, self).__init__(*args, **kwargs)
