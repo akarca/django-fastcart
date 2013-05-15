@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.datastructures import SortedDict
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
-
+from django.db.models.signals import post_delete, post_save
 from .cart_modifiers.loader import get_cart_modifiers, get_cart_item_modifiers
 from . import get_product_model
 
@@ -68,32 +68,25 @@ class Cart(models.Model):
     def __init__(self, *args, **kwargs):
         super(Cart, self).__init__(*args, **kwargs)
         self.modifiers = SortedDict()
-        self.set_cached_items()
-
-    def cachekey(self):
-        if self.pk:
-            return 'fastcart_items_%s' % (self.pk)
-
-    def set_cached_items(self):
-        if self.cachekey():
-            items = cache.get(self.cachekey())
-            if items:
-                self.cached_items = items
-                cache.set(self.cachekey(), items, 60 * 60 * 24)
-                return None
-        self.reset_cached_items()
 
     def reset_cached_items(self):
-        print 'reset cached ITEMSSSSSSSSSS'
-        self.cached_items = self.items.all()
-        if self.cachekey():
-            try:
-                cache.set(self.cachekey(), self.cached_items, 60 * 60 * 24)
-            except Exception as e:
-                pass
+        key = self.cachekey()
+        l = list(self.items.all())
+        cache.set(key, l, 60 * 60 * 24 * 7 * 4)
+        return l
+
+    def cachekey(self, append=''):
+        return 'fastcart_items:%s%s' % (self.pk, append)
 
     def get_items(self):
-        return self.cached_items
+        key = self.cachekey()
+        l = cache.get(key, '!')
+        if l is '!':
+            return self.reset_cached_items()
+        elif l:
+            return l
+        else:
+            return []
 
     def get_price(self):
         price = Decimal('0.00')
@@ -114,20 +107,15 @@ class Cart(models.Model):
         return total_price
 
     def add(self, product, quantity=1):
-        item, created = self.items.get_or_create(
-            product=product,
-            defaults={'quantity': quantity},
-        )
+        item, created = self.items.get_or_create(product=product)
         if not created:
             item.quantity += quantity
             item.save()
-        self.reset_cached_items()
         return item
 
     def clear(self):
         self.items.all().delete()
         self.modifiers.clear()
-        self.reset_cached_items()
 
 
 class CartItem(models.Model):
@@ -158,3 +146,12 @@ class CartItem(models.Model):
         for modifier in get_cart_item_modifiers():
             total_price = modifier(self, total_price)
         return total_price
+
+
+def cartitem_changed(sender, instance, **kwargs):
+    instance.cart.reset_cached_items()
+    pass
+
+
+post_delete.connect(cartitem_changed, sender=CartItem)
+post_save.connect(cartitem_changed, sender=CartItem)

@@ -32,10 +32,6 @@ class UpdateCartItemForm(forms.ModelForm):
         super(UpdateCartItemForm, self).__init__(*args, **kwargs)
         self.fields['quantity'].required = False
 
-    def save(self, *args, **kwargs):
-        super(UpdateCartItemForm, self).save(*args, **kwargs)
-        self.instance.cart.reset_cached_items()
-
     def clean_quantity(self):
         quantity = self.cleaned_data['quantity']
         return quantity if quantity is not None else 1
