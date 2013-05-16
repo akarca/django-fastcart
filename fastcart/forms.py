@@ -7,7 +7,9 @@ from . import get_product_model
 
 class CartItemForm(forms.Form):
     product = forms.ModelChoiceField(queryset=get_product_model().objects.all())
-    quantity = forms.IntegerField(min_value=1, initial=1, required=False)
+    quantity = forms.IntegerField(min_value=1,
+                                  initial=1,
+                                  required=False)
 
     def clean_quantity(self):
         quantity = self.cleaned_data['quantity']
@@ -19,7 +21,6 @@ class CartItemForm(forms.Form):
 
 
 class UpdateCartItemForm(forms.ModelForm):
-
     quantity = forms.IntegerField(min_value=1,
                                   initial=1,
                                   required=False)

@@ -1,13 +1,25 @@
+
+from django.utils.simplejson import dumps, loads, JSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django.core.urlresolvers import reverse_lazy
-
+from django.utils.functional import curry
 
 from .forms import CartItemForm, UpdateCartItemForm
 from .models import Cart
+
+
+class DjangoJSONEncoder(JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, QuerySet):
+            return loads(serialize('json', obj))
+        return JSONEncoder.default(self, obj)
+
+dumps = curry(dumps, cls=DjangoJSONEncoder)
 
 
 class CartItemListView(ListView):
@@ -21,15 +33,15 @@ class CartItemListView(ListView):
             form.add_to_cart(request.cart)
             if request.is_ajax():
                 return HttpResponse(
-                    json.dumps({
-                               'result': 'success',
-                               'count': request.cart.get_count(),
-                               'total': request.cart.get_total_price(),
-                               }),
+                    dumps({
+                          'result': 'success',
+                          'count': request.cart.get_count(),
+                          'total': request.cart.get_total_price(),
+                          }),
                     mimetype="application/json")
         elif request.is_ajax():
             return HttpResponse(
-                json.dumps({
+                dumps({
                     'result': 'fail',
                     'count': request.cart.get_count(),
                     'total': request.cart.get_total_price(),
@@ -57,7 +69,7 @@ class CartItemUpdateView(SingleObjectMixin, View):
             form.save()
             if request.is_ajax():
                 return HttpResponse(
-                    json.dumps({
+                    dumps({
                         'result': 'success',
                         'count': request.cart.get_count(),
                         'total': request.cart.get_total_price(),

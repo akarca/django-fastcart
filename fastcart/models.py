@@ -120,7 +120,6 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items')
-
     product = models.ForeignKey(settings.FASTCART_PRODUCT_MODEL)
     quantity = models.PositiveIntegerField(default=1)
     created_on = models.DateTimeField(auto_now_add=True)
