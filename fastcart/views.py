@@ -50,13 +50,6 @@ class CartItemListView(ListView):
         return redirect('fastcart_cart_item_list')
 
 
-class CartItemDeleteView(DeleteView):
-    success_url = reverse_lazy('fastcart_cart_item_list')
-
-    def get_queryset(self):
-        return self.request.cart.items.all()
-
-
 class CartItemUpdateView(SingleObjectMixin, View):
     success_url = reverse_lazy('fastcart_cart_item_list')
 
@@ -75,4 +68,22 @@ class CartItemUpdateView(SingleObjectMixin, View):
                         'total': request.cart.get_total_price(),
                     }),
                     mimetype="application/json")
+        return redirect(self.success_url)
+
+
+class CartItemDeleteView(SingleObjectMixin, View):
+    success_url = reverse_lazy('fastcart_cart_item_list')
+
+    def get_queryset(self):
+        return self.request.cart.items.all()
+
+    def post(self, request, *args, **kwargs):
+        self.get_object().delete()
+        if request.is_ajax():
+            return HttpResponse(dumps({
+                'result': 'success',
+                'count': request.cart.get_count(),
+                'total': request.cart.get_total_price(),
+            }),
+                mimetype="application/json")
         return redirect(self.success_url)
