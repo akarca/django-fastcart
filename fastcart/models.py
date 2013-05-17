@@ -64,9 +64,9 @@ class CartManager(models.Manager):
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(User,
-                                null=True,
-                                blank=True)
+    user = models.ForeignKey(User,
+                             null=True,
+                             blank=True)
 
     site = models.ForeignKey(Site,
                              verbose_name=u'Site',
@@ -80,7 +80,7 @@ class Cart(models.Model):
 
     class Meta:
         ordering = ['-updated_on']
-        # unique_together = ('cart', 'product')
+        unique_together = ('user', 'site')
 
     def __init__(self, *args, **kwargs):
         super(Cart, self).__init__(*args, **kwargs)
