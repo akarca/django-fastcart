@@ -6,6 +6,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django.core.urlresolvers import reverse_lazy
 
+from shop.models import WishCart
 
 from .forms import CartItemForm, UpdateCartItemForm
 from .models import Cart
@@ -16,6 +17,11 @@ class CartItemListView(ListView):
 
     def get_queryset(self):
         return self.request.cart.items.all()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CartItemListView, self).get_context_data(*args, **kwargs)
+        context['wishcart'] = WishCart.objects.get_or_create(user=request.user).prefetch_related('items')
+        return context
 
     def post(self, request, *args, **kwargs):
         form = CartItemForm(request.POST)
