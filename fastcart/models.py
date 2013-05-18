@@ -8,6 +8,7 @@ from django.utils.datastructures import SortedDict
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_delete, post_save
+
 from .cart_modifiers.loader import get_cart_modifiers, get_cart_item_modifiers
 from . import get_product_model
 
@@ -20,9 +21,10 @@ class CartManager(models.Manager):
         user_cart = None
         session_cart = None
         session_cart_id = None
+        session_key = 'cart'
 
-        if 'cart' in request.session:
-            session_cart_id = request.session['cart']
+        if session_key in request.session:
+            session_cart_id = request.session[session_key]
 
         if request.user.is_authenticated():
             user_cart, created = self.get_or_create(user=request.user)
@@ -42,7 +44,7 @@ class CartManager(models.Manager):
                             user_cart.reset_cached_items()
                     except self.model.DoesNotExist:
                         pass
-            request.session['cart'] = user_cart.pk
+            request.session[session_key] = user_cart.pk
             return user_cart
 
         if session_cart_id:
@@ -52,7 +54,7 @@ class CartManager(models.Manager):
             except self.model.DoesNotExist:
                 pass
         session_cart = self.create(user=None)
-        request.session['cart'] = session_cart.pk
+        request.session[session_key] = session_cart.pk
         return session_cart
 
 
@@ -118,19 +120,15 @@ class Cart(models.Model):
         self.modifiers.clear()
 
 
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='items')
+class BaseCartItem(models.Model):
     product = models.ForeignKey(settings.FASTCART_PRODUCT_MODEL)
     quantity = models.PositiveIntegerField(default=1)
     created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        abstract = True
         ordering = ['-created_on']
         unique_together = ('cart', 'product')
-
-    def __init__(self, *args, **kwargs):
-        super(CartItem, self).__init__(*args, **kwargs)
-        self.modifiers = SortedDict()
 
     @property
     def unit_price(self):
@@ -145,6 +143,14 @@ class CartItem(models.Model):
         for modifier in get_cart_item_modifiers():
             total_price = modifier(self, total_price)
         return total_price
+
+
+class CartItem(BaseCartItem):
+    cart = models.ForeignKey(Cart, related_name='items')
+
+    def __init__(self, *args, **kwargs):
+        super(CartItem, self).__init__(*args, **kwargs)
+        self.modifiers = SortedDict()
 
 
 def cartitem_changed(sender, instance, **kwargs):
