@@ -112,7 +112,9 @@ class Cart(models.Model):
         item, created = self.items.get_or_create(product=product)
         if not created:
             item.quantity += quantity
-            item.save()
+        else:
+            item.quantity = quantity
+        item.save()
         return item
 
     def clear(self):
