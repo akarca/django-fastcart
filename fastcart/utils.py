@@ -1,4 +1,4 @@
-from django.utils.simplejson import dumps, loads, JSONEncoder
+from django.utils.simplejson import dumps as d, loads, JSONEncoder
 from django.utils.functional import curry
 
 
@@ -9,4 +9,4 @@ class DjangoJSONEncoder(JSONEncoder):
             return loads(serialize('json', obj))
         return JSONEncoder.default(self, obj)
 
-dumps = curry(dumps, cls=DjangoJSONEncoder)
+dumps = curry(d, cls=DjangoJSONEncoder)

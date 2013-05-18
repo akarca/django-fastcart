@@ -1,4 +1,3 @@
-
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, View
@@ -18,9 +17,9 @@ class CartItemListView(ListView):
     def get_queryset(self):
         return self.request.cart.items.all()
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(CartItemListView, self).get_context_data(*args, **kwargs)
-        context['wishcart'] = WishCart.objects.get_or_create(user=request.user).prefetch_related('items')
+    def get_context_data(self, **kwargs):
+        context = super(CartItemListView, self).get_context_data(**kwargs)
+        context['wishcart'], created = WishCart.objects.prefetch_related().get_or_create(user=self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):

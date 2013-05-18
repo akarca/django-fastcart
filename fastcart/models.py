@@ -135,19 +135,15 @@ class Cart(models.Model):
         self.modifiers.clear()
 
 
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='items')
+class BaseCartItem(models.Model):
     product = models.ForeignKey(settings.FASTCART_PRODUCT_MODEL)
     quantity = models.PositiveIntegerField(default=1)
     created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        abstract = True
         ordering = ['-created_on']
         unique_together = ('cart', 'product')
-
-    def __init__(self, *args, **kwargs):
-        super(CartItem, self).__init__(*args, **kwargs)
-        self.modifiers = SortedDict()
 
     @property
     def unit_price(self):
@@ -162,6 +158,14 @@ class CartItem(models.Model):
         for modifier in get_cart_item_modifiers():
             total_price = modifier(self, total_price)
         return total_price
+
+
+class CartItem(BaseCartItem):
+    cart = models.ForeignKey(Cart, related_name='items')
+
+    def __init__(self, *args, **kwargs):
+        super(CartItem, self).__init__(*args, **kwargs)
+        self.modifiers = SortedDict()
 
 
 def cartitem_changed(sender, instance, **kwargs):
