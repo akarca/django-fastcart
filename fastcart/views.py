@@ -6,6 +6,7 @@ from django.views.generic.edit import DeleteView
 from django.core.urlresolvers import reverse_lazy
 
 from shop.models import WishCart
+from custom_sites.localstorage import get_site
 
 from .forms import CartItemForm, UpdateCartItemForm
 from .models import Cart
@@ -19,7 +20,9 @@ class CartItemListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CartItemListView, self).get_context_data(**kwargs)
-        context['wishcart'], created = WishCart.objects.prefetch_related().get_or_create(user=self.request.user)
+        if self.request.user.is_authenticated():
+            wishcart, created = WishCart.objects.get_or_create(user=self.request.user, site=get_site())
+            context['wishcart'] = wishcart
         return context
 
     def post(self, request, *args, **kwargs):

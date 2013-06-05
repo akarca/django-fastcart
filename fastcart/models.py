@@ -145,7 +145,6 @@ class BaseCartItem(models.Model):
     class Meta:
         abstract = True
         ordering = ['-created_on']
-        unique_together = ('cart', 'product')
 
     @property
     def unit_price(self):
@@ -163,7 +162,10 @@ class BaseCartItem(models.Model):
 
 
 class CartItem(BaseCartItem):
-    cart = models.ForeignKey(Cart, related_name='items')
+    cart = models.ForeignKey(Cart,
+                             related_name='items',
+                             null=True,
+                             blank=True)
 
     def __init__(self, *args, **kwargs):
         super(CartItem, self).__init__(*args, **kwargs)
@@ -171,7 +173,8 @@ class CartItem(BaseCartItem):
 
 
 def cartitem_changed(sender, instance, **kwargs):
-    instance.cart.reset_cached_items()
+    if instance.cart:
+        instance.cart.reset_cached_items()
     pass
 
 
