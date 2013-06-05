@@ -3,8 +3,9 @@ from setuptools import find_packages
 
 setup(
     name='django-fastcart',
-    version='0.1dev',
+    version='1.0',
     url='http://www.github.com/serdarakarca/django-fastcart',
+    download_url='http://github.com/serdarakarca/django-fastcart/archive/master.zip',
     packages=find_packages(),
     include_package_data=True,
     license='GNU',
