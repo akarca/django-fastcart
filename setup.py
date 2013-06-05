@@ -5,7 +5,7 @@ setup(
     name='django-fastcart',
     version='1.0',
     url='http://www.github.com/serdarakarca/django-fastcart',
-    download_url='http://github.com/serdarakarca/django-fastcart/archive/master.zip',
+    download_url='https://codeload.github.com/serdarakarca/django-fastcart/zip/master',
     packages=find_packages(),
     include_package_data=True,
     license='GNU',
