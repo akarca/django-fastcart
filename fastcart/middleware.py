@@ -1,5 +1,5 @@
 from django.utils.functional import SimpleLazyObject
-from fastcart.models import Cart
+from fastcart.models import Cart, BaseCartItem
 
 
 class CartMiddleware(object):
